@@ -8,7 +8,13 @@ from app.checker import run_check
 
 logger = logging.getLogger(__name__)
 
-scheduler = BackgroundScheduler()
+scheduler = BackgroundScheduler(
+    job_defaults={"coalesce": True, "max_instances": 1, "misfire_grace_time": 30},
+    timezone="UTC",
+)
+
+def _job_id(check_id: int) -> str:
+    return f"check_{check_id}"
 
 async def run_check_task(check_id: int):
     """Background task to run a check and save execution result"""
@@ -51,27 +57,30 @@ def run_check_task_sync(check_id: int):
     """Wrapper to run async check task in sync context"""
     asyncio.run(run_check_task(check_id))
 
+def schedule_check_job(check: Check):
+    try:
+        scheduler.add_job(
+            run_check_task_sync,
+            'interval',
+            minutes=check.interval_minutes,
+            args=[check.id],
+            id=_job_id(check.id),
+            replace_existing=True,
+        )
+        logger.info(f"Scheduled check {check.id} ({check.name}) to run every {check.interval_minutes} minutes")
+    except Exception as e:
+        logger.error(f"Error scheduling check {check.id} ({check.name}): {e}")
+
 def start_scheduler():
     """Start the scheduler and load all checks"""
     if scheduler.running:
         return
-
+    scheduler.start()
     db = SessionLocal()
     try:
         checks = get_checks(db)
         for check in checks:
-            # Schedule each check to run at its interval
-            scheduler.add_job(
-                run_check_task_sync,
-                'interval',
-                minutes=check.interval_minutes,
-                args=[check.id],
-                id=f"check_{check.id}",
-                replace_existing=True,
-            )
-            logger.info(f"Scheduled check {check.id} ({check.name}) to run every {check.interval_minutes} minutes")
-
-        scheduler.start()
+            schedule_check_job(check)
         logger.info("Scheduler started")
     except Exception as e:
         logger.error(f"Error starting scheduler: {e}")

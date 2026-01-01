@@ -43,3 +43,46 @@ GET /checks/{id}/history
 
 ## Architecture (High-Level)
 Scheduler → Test Runner → Comparator → Database → Alerts
+
+## Next Steps
+1. **Stabilize backend**
+   - Clean structure
+   - Error handling, retries, timeouts
+   - Persist health, latency, history in DB
+
+2. **Harden scheduler**
+   - Single APScheduler instance
+   - DB-backed job store
+   - Jobs survive restarts
+
+3. **Dockerize app**
+   - Dockerfile
+   - docker-compose for local dev
+   - Env vars for config/secrets
+
+4. **Set up cloud**
+   - Choose provider (Render / Railway / Fly.io)
+   - Managed Postgres
+   - Configure env vars
+
+5. **Add CI (Continuous Integration)**
+   - Run tests & lint on every push
+   - Build Docker image
+   - Fail fast on errors
+
+6. **Add CD (Continuous Deployment)**
+   - Auto-deploy if CI passes
+   - No manual redeploys
+
+7. **Deploy backend**
+   - Public HTTPS endpoint
+   - Scheduler running in production
+   - Verify DB + jobs
+
+8. **Add basic frontend**
+   - Status dashboard
+   - Latency/history view
+
+9. **Alerts & observability**
+   - Email/Slack alerts
+   - Logs & basic metrics
