@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, DateTime, JSON, String, ForeignKey
+from sqlalchemy import Column, Integer, DateTime, JSON, String, ForeignKey, Text
 from pydantic import BaseModel, HttpUrl
 from typing import List, Literal, Optional
 from datetime import datetime
@@ -16,7 +16,7 @@ class Check(Base):
     __tablename__ = "checks"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=False, unique=True, index=True)
     url = Column(String, nullable=False)
     required_fields = Column(JSON, nullable=False)
     expected_status_code = Column(Integer, default=200)
@@ -33,4 +33,5 @@ class CheckExecution(Base):
     missing_fields = Column(JSON, nullable=True)
     actual_status_code = Column(Integer, nullable=True)
     latency_ms = Column(Integer, nullable=True)
+    error = Column(Text, nullable=True)
     executed_at = Column(DateTime, default=datetime.utcnow)

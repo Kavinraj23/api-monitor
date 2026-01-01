@@ -12,12 +12,16 @@ def create_check(db: Session, name: str, url: str, required_fields: List[str], e
         required_fields=required_fields,
         expected_status_code=expected_status_code,
         latency_threshold_ms=latency_threshold_ms,
-        interval_minutes=interval_minutes
+        interval_minutes=interval_minutes,
     )
-    db.add(db_check)
-    db.commit()
-    db.refresh(db_check)
-    return db_check
+    try:
+        db.add(db_check)
+        db.commit()
+        db.refresh(db_check)
+        return db_check
+    except Exception:
+        db.rollback()
+        raise
 
 def get_check(db: Session, check_id: int) -> Optional[Check]:
     """Get a check by ID"""
@@ -44,7 +48,8 @@ def create_execution(
     status: str,
     missing_fields: List[str],
     actual_status_code: int = None,
-    latency_ms: float = None
+    latency_ms: float = None,
+    error: Optional[str] = None,
 ) -> CheckExecution:
     """Record a check execution result"""
     db_execution = CheckExecution(
@@ -52,12 +57,17 @@ def create_execution(
         status=status,
         missing_fields=missing_fields,
         actual_status_code=actual_status_code,
-        latency_ms=latency_ms
+        latency_ms=latency_ms,
+        error=error,
     )
-    db.add(db_execution)
-    db.commit()
-    db.refresh(db_execution)
-    return db_execution
+    try:
+        db.add(db_execution)
+        db.commit()
+        db.refresh(db_execution)
+        return db_execution
+    except Exception:
+        db.rollback()
+        raise
 
 def get_check_history(
     db: Session,

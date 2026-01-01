@@ -63,7 +63,7 @@ async def run_check(check):
             missing.append(field)
 
     status = "PASS"
-    if not missing:
+    if missing:
         status = "FAIL"
     if hasattr(check, "expected_status_code") and response.status_code != check.expected_status_code:
         status = "FAIL"
@@ -77,5 +77,6 @@ async def run_check(check):
         "status": status,
         "missing_fields": missing,
         "status_code": response.status_code,
-        "latency_ms": latency_ms
+        "latency_ms": latency_ms,
+        "error": None,
     }

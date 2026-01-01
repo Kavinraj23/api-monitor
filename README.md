@@ -45,17 +45,17 @@ GET /checks/{id}/history
 Scheduler → Test Runner → Comparator → Database → Alerts
 
 ## Next Steps
-1. **Stabilize backend**
+1. **Stabilize backend — done**
    - Clean structure
    - Error handling, retries, timeouts
    - Persist health, latency, history in DB
 
-2. **Harden scheduler**
+2. **Harden scheduler - done**
    - Single APScheduler instance
    - DB-backed job store
    - Jobs survive restarts
 
-3. **Dockerize app**
+3. **Dockerize app - done**
    - Dockerfile
    - docker-compose for local dev
    - Env vars for config/secrets

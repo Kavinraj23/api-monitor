@@ -2,12 +2,13 @@ import logging
 from fastapi import FastAPI, Depends, HTTPException, status
 from typing import List
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from app.models import Check, APICheck
 from app.checker import run_check
 from app.crud import create_check, get_checks, get_check, get_check_history, create_execution, delete_check
 from app.schemas import CheckCreate, CheckResponse, CheckExecutionResponse
 from app.database import get_db
-from app.scheduler import start_scheduler, stop_scheduler, schedule_check_job
+from app.scheduler import start_scheduler, stop_scheduler, schedule_check_job, is_scheduler_running, scheduler_health
 
 # configure logging to see scheduler output
 logging.basicConfig(level=logging.INFO)
@@ -97,6 +98,23 @@ async def run_check_endpoint(check_id: int, db: Session = Depends(get_db)):
         status=result.get("status", "FAIL"),
         missing_fields=result.get("missing_fields", []),
         actual_status_code=result.get("status_code"),
-        latency_ms=result.get("latency_ms")
+        latency_ms=result.get("latency_ms"),
+        error=result.get("error"),
     )
     return execution
+
+
+@app.get("/health")
+def health(db: Session = Depends(get_db)):
+    """Simple health endpoint exposing DB connectivity and scheduler state"""
+    scheduler_status = scheduler_health()
+    try:
+        db.execute(text("SELECT 1"))
+        db_status = "ok"
+    except Exception:
+        logging.exception("Health check DB failure")
+        db_status = "error"
+    return {
+        "db": db_status,
+        "scheduler": scheduler_status,
+    }
