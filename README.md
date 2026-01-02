@@ -60,15 +60,15 @@ Scheduler → Test Runner → Comparator → Database → Alerts
    - docker-compose for local dev
    - Env vars for config/secrets
 
-4. **Set up cloud**
-   - Choose provider (Render / Railway / Fly.io)
-   - Managed Postgres
-   - Configure env vars
-
-5. **Add CI (Continuous Integration)**
+4. **Add CI (Continuous Integration) - done**
    - Run tests & lint on every push
    - Build Docker image
    - Fail fast on errors
+
+5. **Set up cloud**
+   - Choose provider (Render / Railway / Fly.io)
+   - Managed Postgres
+   - Configure env vars
 
 6. **Add CD (Continuous Deployment)**
    - Auto-deploy if CI passes
@@ -79,10 +79,6 @@ Scheduler → Test Runner → Comparator → Database → Alerts
    - Scheduler running in production
    - Verify DB + jobs
 
-8. **Add basic frontend**
-   - Status dashboard
-   - Latency/history view
-
-9. **Alerts & observability**
+8. **Alerts & observability**
    - Email/Slack alerts
    - Logs & basic metrics
