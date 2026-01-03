@@ -21,4 +21,8 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Create entrypoint script
+RUN echo '#!/bin/sh\nalembic upgrade head\nuvicorn app.main:app --host 0.0.0.0 --port 8000' > /app/entrypoint.sh && \
+    chmod +x /app/entrypoint.sh
+
+CMD ["/app/entrypoint.sh"]
