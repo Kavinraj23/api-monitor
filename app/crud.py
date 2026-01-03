@@ -1,10 +1,20 @@
+from typing import List
+
 from sqlalchemy.orm import Session
+
 from app.models import Check, CheckExecution
-from typing import List, Optional
 
 # ============ CHECK OPERATIONS ============
 
-def create_check(db: Session, name: str, url: str, required_fields: List[str], expected_status_code: int = 200, latency_threshold_ms: int = None, interval_minutes: int = 5) -> Check:
+def create_check(
+    db: Session,
+    name: str,
+    url: str,
+    required_fields: List[str],
+    expected_status_code: int = 200,
+    latency_threshold_ms: int | None = None,
+    interval_minutes: int = 5,
+) -> Check:
     """Create a new API check"""
     db_check = Check(
         name=name,

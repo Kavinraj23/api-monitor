@@ -160,7 +160,7 @@ def scheduler_health() -> dict:
         jobs = scheduler.get_jobs()
         job_count = len(jobs)
         jobstore_ok = True
-    except Exception as exc:
+    except Exception:
         logger.exception("Scheduler jobstore check failed")
         job_count = None
         jobstore_ok = False

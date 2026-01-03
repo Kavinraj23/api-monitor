@@ -1,27 +1,16 @@
 import os
-import sys
 from pathlib import Path
 
 import pytest
-
-# Ensure repo is on path
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-
-# Set env BEFORE any imports
-os.environ["DATABASE_URL"] = os.getenv(
-    "DATABASE_URL",
-    "postgresql+psycopg2://postgres:postgres@localhost:5432/api_monitor",
-)
-os.environ["SCHEDULER_ENABLED"] = "false"
-
 from alembic import command
 from alembic.config import Config
 from sqlalchemy import text
 
-from app.database import SessionLocal, Base, engine
 from app import crud
+from app.database import Base, SessionLocal, engine
+
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def run_migrations():

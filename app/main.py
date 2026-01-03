@@ -8,7 +8,7 @@ from app.checker import run_check
 from app.crud import create_check, get_checks, get_check, get_check_history, create_execution, delete_check
 from app.schemas import CheckCreate, CheckResponse, CheckExecutionResponse
 from app.database import get_db
-from app.scheduler import start_scheduler, stop_scheduler, schedule_check_job, is_scheduler_running, scheduler_health
+from app.scheduler import start_scheduler, stop_scheduler, schedule_check_job, scheduler_health
 
 # configure logging to see scheduler output
 logging.basicConfig(level=logging.INFO)
@@ -39,7 +39,15 @@ def create_check_endpoint(check: CheckCreate, db: Session = Depends(get_db)):
     existing = db.query(Check).filter(Check.name == check.name).first()
     if existing:
         raise HTTPException(status_code=400, detail="Check with this name already exists")
-    db_check = create_check(db, check.name, check.url, check.required_fields, check.expected_status_code, check.latency_threshold_ms, check.interval_minutes)
+    db_check = create_check(
+        db,
+        check.name,
+        check.url,
+        check.required_fields,
+        check.expected_status_code,
+        check.latency_threshold_ms,
+        check.interval_minutes,
+    )
     try:
         schedule_check_job(db_check)
     except Exception:
@@ -82,9 +90,15 @@ async def run_check_endpoint(check_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Check not found")
 
     # Build APICheck from stored check
-    payload = APICheck(method="GET", url=db_check.url, required_fields=db_check.required_fields, expected_status_code=db_check.expected_status_code, latency_threshold_ms=db_check.latency_threshold_ms)
+    payload = APICheck(
+        method="GET",
+        url=db_check.url,
+        required_fields=db_check.required_fields,
+        expected_status_code=db_check.expected_status_code,
+        latency_threshold_ms=db_check.latency_threshold_ms,
+    )
     # Run the check
-    
+
     try:
         result = await run_check(payload)
     except Exception as e:

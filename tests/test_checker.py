@@ -1,16 +1,10 @@
-import sys
-from pathlib import Path
 import json
-
-# Ensure project root is importable when running tests without installation
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
-from app.models import APICheck
+
 from app.checker import run_check
+from app.models import APICheck
 
 
 def _mock_async_client(mock_response):

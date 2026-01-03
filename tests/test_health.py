@@ -1,17 +1,5 @@
-import os
-import sys
-from pathlib import Path
-
-# Set env vars BEFORE any app imports
-os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
-os.environ.setdefault("SCHEDULER_ENABLED", "false")
-
-# Ensure project root is importable when running tests without installation
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-
 from fastapi.testclient import TestClient
+
 from app.main import app
 
 def test_health_endpoint():
